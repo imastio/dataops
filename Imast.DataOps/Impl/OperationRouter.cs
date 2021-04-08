@@ -116,7 +116,7 @@ namespace Imast.DataOps.Impl
             }
 
             // require the operation to match expected result type (tolerate unknown result type)
-            if (operation.ResultType != resultType || operation.ResultType != ResultType.Unknown)
+            if (operation.ResultType != resultType && operation.ResultType != ResultType.Unknown)
             {
                 throw new IncorrectOperationException($"The operation {key.Group}/{key.Name} is defined to result {operation.ResultType} but result {resultType} is required in this context.");
             }

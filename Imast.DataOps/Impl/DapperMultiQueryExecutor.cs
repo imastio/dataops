@@ -46,7 +46,7 @@ namespace Imast.DataOps.Impl
             // use type based on value
             var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
-            return this.MaybeTransactional(
+            return this.MaybeTransactionalAsync(
                 transaction => this.Connection.QueryMultipleAsync(source, param, transaction, timeout, type)
                     .ContinueWith(t => (IMultiResult) new DapperMultiResult(t.Result)));
         }

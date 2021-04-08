@@ -48,7 +48,7 @@ namespace Imast.DataOps.Impl
             // use type based on value
             var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
-            return this.MaybeTransactional(transaction => this.Connection.QueryAsync<TResult>(source, param, transaction, timeout, type));
+            return this.MaybeTransactionalAsync(transaction => this.Connection.QueryAsync<TResult>(source, param, transaction, timeout, type));
         }
     }
 }
