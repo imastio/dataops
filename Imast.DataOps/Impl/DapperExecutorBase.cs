@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Threading.Tasks;
 using Imast.DataOps.Api;
 
 namespace Imast.DataOps.Impl
@@ -62,21 +63,36 @@ namespace Imast.DataOps.Impl
         /// <returns></returns>
         protected abstract TExecutor GetThis();
 
-        protected TResult MaybeTransactional<TResult>(Func<IDbTransaction, TResult> function)
+        /// <summary>
+        /// Wrap async operation into a transaction if required
+        /// </summary>
+        /// <typeparam name="TResult">The result type of entity</typeparam>
+        /// <param name="function">The function to execute</param>
+        /// <returns></returns>
+        protected async Task<TResult> MaybeTransactionalAsync<TResult>(Func<IDbTransaction, Task<TResult>> function)
         {
+            // connection was initially closed
+            var wasClosed = this.Connection.State == ConnectionState.Closed;
+
             // use given transaction
             var transaction = this.Transaction;
 
             // if no transaction given but auto-transaction is setup
             if (transaction == null && this.AutoTransaction.HasValue)
             {
+                // open connection to build a transaction
+                if (wasClosed)
+                {
+                    this.Connection.Open();
+                }
+
                 transaction = this.Connection.BeginTransaction(MapIsolation(this.AutoTransaction.Value));
             }
 
             try
             {
                 // execute given function within context
-                var result = function(transaction);
+                var result = await function(transaction);
 
                 // should this be committed 
                 if (this.AutoCommit)
@@ -98,6 +114,14 @@ namespace Imast.DataOps.Impl
 
                 // rethrow
                 throw;
+            }
+            finally
+            {
+                // if connection was closed then close it back
+                if (wasClosed)
+                {
+                    this.Connection.Close();
+                }
             }
         }
 

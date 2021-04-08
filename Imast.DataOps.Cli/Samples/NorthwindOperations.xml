@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<DataOperations xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Imast.DataOps/DataOps.xsd">
+	
+	<DataConfiguration  />
+
+	<OperationGroup Name="Products">
+		
+		<SqlOperation Name="GetAll" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="ReadCommitted">
+			<Command>select * from Products</Command>
+		</SqlOperation>
+
+	</OperationGroup>
+
+</DataOperations>

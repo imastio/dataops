@@ -6,7 +6,7 @@ namespace Imast.DataOps.Api
     /// <summary>
     /// The Data Operations access point
     /// </summary>
-    public class DataOps
+    public class DataOperations
     {
         /// <summary>
         /// The operation registry
@@ -29,7 +29,7 @@ namespace Imast.DataOps.Api
         /// <param name="operations">The registry of operations</param>
         /// <param name="connections">The registry of connection suppliers</param>
         /// <param name="defaultProvider">The specific provider to use by default</param>
-        public DataOps(IOperationRegistry operations, IConnectionRegistry connections = null, SqlProvider? defaultProvider = null)
+        public DataOperations(IOperationRegistry operations, IConnectionRegistry connections = null, SqlProvider? defaultProvider = null)
         {
             this.operations = operations;
             this.connections = connections;

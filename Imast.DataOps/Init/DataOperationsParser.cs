@@ -147,7 +147,7 @@ namespace Imast.DataOps.Init
             }
 
             // load validation xsd into the stream
-            using var xsdStream = this.GetType().Assembly.GetManifestResourceStream("DataOps.xsd");
+            using var xsdStream = this.GetType().Assembly.GetManifestResourceStream("Imast.DataOps.DataOps.xsd");
 
             // nothing was loaded
             if (xsdStream == null)
@@ -155,6 +155,7 @@ namespace Imast.DataOps.Init
                 throw new FileLoadException("Could not load validation XSD schema");
             }
 
+            // read validation schema
             this.validationSchema = XmlSchema.Read(xsdStream, null);
 
             // error while loading
@@ -180,7 +181,7 @@ namespace Imast.DataOps.Init
             };
 
             // map operations based on child elements
-            group.Operations = element.GetElementsByTagName("SqlOperationDefinition")
+            group.Operations = element.GetElementsByTagName("SqlOperation")
                 .Cast<XmlElement>()
                 .Select(opElement => MapOperation(group, opElement))
                 .ToList();
@@ -295,7 +296,7 @@ namespace Imast.DataOps.Init
         private static void MapTransactionOptionsTo(XmlNode element, ITransactionOptions options)
         {
             // try get and parse transactional mode
-            if (Enum.TryParse<AutoTransactionMode>(element.Attributes?["AutoTransactionMode"]?.Value, out var transactional))
+            if (Enum.TryParse<AutoTransactionMode>(element.Attributes?["AutoTransaction"]?.Value, out var transactional))
             {
                 options.AutoTransaction = transactional;
             }
