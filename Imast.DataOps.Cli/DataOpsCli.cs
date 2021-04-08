@@ -29,11 +29,22 @@ namespace Imast.DataOps.Cli
                 .WithSource("Samples/NorthwindOperations.xml")
                 .Build();
 
-           
-            // do operation and get result
-            var result = dataOps.Connect().Query("Products", "GetAll").ExecuteAsync<Product>().Result;
 
-            Console.WriteLine($"Got ${result.Count()} entries");
+            // do operation and get result
+            var multiResult = dataOps.Connect().MultiQuery("Products", "GetAll").ExecuteAsync(async reader =>
+            {
+                var products = await reader.ReadAsync<Product>();
+                var cats = await reader.ReadAsync<dynamic>();
+
+                return Tuple.Create(products, cats);
+            }).Result;
+
+            Console.WriteLine($"MultiRead Result: Products {multiResult.Item1.Count()}, Categories: {multiResult.Item2.Count()}");
+
+            var writeResult = dataOps.Connect().NonQuery("Other", "WriteLog")
+                .ExecuteAsync(new {Message = $"Hello. It's {DateTime.Now}"}).Result;
+
+            Console.WriteLine($"Log Written: {writeResult}");
         }
     }
 }

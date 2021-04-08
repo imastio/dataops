@@ -7,9 +7,19 @@
 	<OperationGroup Name="Products">
 		
 		<SqlOperation Name="GetAll" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="ReadCommitted">
-			<Command>select * from Products</Command>
+			<Command>
+				select * from Products;
+				select * from Categories
+			</Command>
 		</SqlOperation>
-
 	</OperationGroup>
 
+	<OperationGroup Name="Other">
+		<SqlOperation Name="WriteLog" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="RepeatableRead">
+			<Command>
+				insert into Log (Message)
+				values (@Message)
+			</Command>
+		</SqlOperation>
+	</OperationGroup>
 </DataOperations>

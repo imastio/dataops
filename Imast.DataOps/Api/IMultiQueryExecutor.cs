@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Imast.DataOps.Api
 {
@@ -10,8 +11,9 @@ namespace Imast.DataOps.Api
         /// <summary>
         /// Execute the current operation
         /// </summary>
+        /// <param name="resultHandler">The result handler function</param>
         /// <param name="param">The parameter if given</param>
         /// <returns></returns>
-        Task<IMultiResult> ExecuteAsync(object param = null);
+        Task<TResult> ExecuteAsync<TResult>(Func<IMultiResult, Task<TResult>> resultHandler, object param = null);
     }
 }
