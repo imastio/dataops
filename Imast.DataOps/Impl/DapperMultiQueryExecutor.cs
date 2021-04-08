@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Imast.DataOps.Api;
@@ -33,9 +34,10 @@ namespace Imast.DataOps.Impl
         /// <summary>
         /// Execute the current operation
         /// </summary>
+        /// <param name="resultHandler">The result handler function</param>
         /// <param name="param">The parameter if given</param>
         /// <returns></returns>
-        public Task<IMultiResult> ExecuteAsync(object param = null)
+        public async Task<TResult>ExecuteAsync<TResult>(Func<IMultiResult, Task<TResult>> resultHandler, object param = null)
         {
             // the timeout to use
             var timeout = this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
@@ -46,9 +48,17 @@ namespace Imast.DataOps.Impl
             // use type based on value
             var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
-            return this.MaybeTransactionalAsync(
-                transaction => this.Connection.QueryMultipleAsync(source, param, transaction, timeout, type)
-                    .ContinueWith(t => (IMultiResult) new DapperMultiResult(t.Result)));
+            return await this.MaybeTransactionalAsync(async transaction => 
+            {
+                // perform operation and wait the result
+                var queryResult = await this.Connection.QueryMultipleAsync(source, param, transaction, timeout, type);
+
+                // wrap result into a multi-result reader
+                using var reader = (IMultiResult) new DapperMultiResult(queryResult);
+           
+                // map and get final result
+                return await resultHandler(reader);
+            });
         }
     }
 }

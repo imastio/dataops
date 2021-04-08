@@ -36,7 +36,7 @@ namespace Imast.DataOps.Impl
         /// <typeparam name="TResult">The result type</typeparam>
         /// <param name="param">The parameter if given</param>
         /// <returns></returns>
-        public Task<TResult> ExecuteAsync<TResult>(object param = null)
+        public async Task<TResult> ExecuteAsync<TResult>(object param = null)
         {
             // the timeout to use
             var timeout = this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
@@ -47,7 +47,7 @@ namespace Imast.DataOps.Impl
             // use type based on value
             var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
-            return this.MaybeTransactionalAsync(transaction => this.Connection.ExecuteScalarAsync<TResult>(source, param, transaction, timeout, type));
+            return await this.MaybeTransactionalAsync(transaction => this.Connection.ExecuteScalarAsync<TResult>(source, param, transaction, timeout, type));
         }
     }
 }

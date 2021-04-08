@@ -55,7 +55,7 @@
 				<xs:extension base="xs:string">
 					<xs:attribute name="Type" type="CommandType" default="Text" />
 					<xs:attribute name="NotSupported" type="xs:boolean" default="false" />
-					<xs:attribute name="ExpectedResult" type="ExpectedResultOptions" default="Table" />
+					<xs:attribute name="ExpectedResult" type="ExpectedResultOptions" default="Unknown" />
 				</xs:extension>
 			</xs:simpleContent>
 		</xs:complexType>
@@ -112,6 +112,7 @@
 	<!-- The options of expected results -->
 	<xs:simpleType name="ExpectedResultOptions" final="restriction" >
 		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown" />
 			<xs:enumeration value="Table" />
 			<xs:enumeration value="MultipleTables" />
 			<xs:enumeration value="Scalar" />

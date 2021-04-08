@@ -68,6 +68,7 @@ namespace Imast.DataOps.Impl
         /// </summary>
         /// <typeparam name="TResult">The result type of entity</typeparam>
         /// <param name="function">The function to execute</param>
+        /// <param name="deferCommit">Flag identifies if commit should be deferred</param>
         /// <returns></returns>
         protected async Task<TResult> MaybeTransactionalAsync<TResult>(Func<IDbTransaction, Task<TResult>> function)
         {
