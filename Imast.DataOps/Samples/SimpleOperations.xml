@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<DataOperations xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../DataOps.xsd">
+	
+	<DataConfiguration Scope="File" />
+
+	<OperationGroup Name="User">
+		
+		<SqlOperation Name="GetAll" Compatibility="SqlServer MySQL" IsolationLevel="ReadCommitted">
+			<Command>select * from users where id = @id</Command>
+		</SqlOperation>
+
+	</OperationGroup>
+
+</DataOperations>
