@@ -27,6 +27,11 @@ namespace Imast.DataOps.Impl
         public IDbTransaction Transaction { get; private set; }
 
         /// <summary>
+        /// Indicate if buffered
+        /// </summary>
+        public bool Buffered { get; private set; }
+
+        /// <summary>
         /// The option to auto-commit transaction within the operation
         /// </summary>
         public bool AutoCommit { get; private set; }
@@ -55,6 +60,7 @@ namespace Imast.DataOps.Impl
             this.AutoTransaction = autoTransaction;
             this.Timeout = timeout;
             this.AutoCommit = autoTransaction.HasValue;
+            this.Buffered = true;
         }
 
         /// <summary>
@@ -68,7 +74,6 @@ namespace Imast.DataOps.Impl
         /// </summary>
         /// <typeparam name="TResult">The result type of entity</typeparam>
         /// <param name="function">The function to execute</param>
-        /// <param name="deferCommit">Flag identifies if commit should be deferred</param>
         /// <returns></returns>
         protected async Task<TResult> MaybeTransactionalAsync<TResult>(Func<IDbTransaction, Task<TResult>> function)
         {
@@ -138,6 +143,17 @@ namespace Imast.DataOps.Impl
             this.AutoCommit = autocommit;
             this.AutoTransaction = null;
             return this.GetThis() ;
+        }
+
+        /// <summary>
+        /// Use the value to turn on or off the buffering
+        /// </summary>
+        /// <param name="buffered">The buffering indicator</param>
+        /// <returns></returns>
+        public TExecutor WithBuffering(bool buffered = true)
+        {
+            this.Buffered = buffered;
+            return this.GetThis();
         }
 
 

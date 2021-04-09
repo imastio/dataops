@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
@@ -32,23 +33,90 @@ namespace Imast.DataOps.Impl
         }
 
         /// <summary>
+        /// Gets the effective timeout value
+        /// </summary>
+        /// <returns></returns>
+        protected int? GetEffectiveTimeout()
+        {
+            // the timeout to use
+            return this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
+        }
+
+        /// <summary>
+        /// Gets the effective source value
+        /// </summary>
+        /// <returns></returns>
+        protected string GetEffectiveSource()
+        {
+            // the source of query
+            return this.Operation.Source?.ToString() ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Gets the effective command type
+        /// </summary>
+        /// <returns></returns>
+        protected CommandType GetEffectiveCommandType()
+        {
+            // use type based on value
+            return this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+        }
+
+        /// <summary>
         /// Execute the current operation
         /// </summary>
         /// <typeparam name="TResult">The result type</typeparam>
         /// <param name="param">The parameter if given</param>
         /// <returns></returns>
-        public async Task<IEnumerable<TResult>> ExecuteAsync<TResult>(object param = null)
+        public Task<IEnumerable<TResult>> ExecuteAsync<TResult>(object param = null)
         {
-            // the timeout to use
-            var timeout = this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
-            
-            // the source of query
-            var source = this.Operation.Source?.ToString() ?? string.Empty;
+            return this.MaybeTransactionalAsync(transaction => this.Connection.QueryAsync<TResult>(
+                this.GetEffectiveSource(), 
+                param, 
+                transaction,
+                this.GetEffectiveTimeout(),
+                this.GetEffectiveCommandType()));
+        }
 
-            // use type based on value
-            var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+        /// <summary>
+        /// Execute the current operation
+        /// </summary>
+        /// <typeparam name="TFirst">The first type</typeparam>
+        /// <typeparam name="TSecond">The second type</typeparam>
+        /// <typeparam name="TResult">The result type</typeparam>
+        /// <param name="map">The mapping function for given set</param>
+        /// <param name="splitOn">The set should split on the given value</param>
+        /// <param name="param">The parameter if given</param>
+        /// <returns></returns>
+        public Task<IEnumerable<TResult>> ExecuteAsync<TFirst, TSecond, TResult>(Func<TFirst, TSecond, TResult> map, string splitOn = "id", object param = null)
+        {
+            return this.MaybeTransactionalAsync(transaction => 
+                this.Connection.QueryAsync(
+                    this.GetEffectiveSource(),
+                    map,
+                    param,
+                    transaction,
+                    this.Buffered,
+                    splitOn,
+                    this.GetEffectiveTimeout(),
+                    this.GetEffectiveCommandType())
+                );
+        }
 
-            return await this.MaybeTransactionalAsync(transaction => this.Connection.QueryAsync<TResult>(source, param, transaction, timeout, type));
+        /// <summary>
+        /// Execute the current operation
+        /// </summary>
+        /// <typeparam name="TResult">The result type</typeparam>
+        /// <param name="param">The parameter if given</param>
+        /// <returns></returns>
+        public async Task<TResult> ExecuteFirstOrDefaultAsync<TResult>(object param = null)
+        {
+            return await this.MaybeTransactionalAsync(transaction => this.Connection.QueryFirstOrDefaultAsync<TResult>(
+                this.GetEffectiveSource(),
+                param,
+                transaction,
+                this.GetEffectiveTimeout(),
+                this.GetEffectiveCommandType()));
         }
     }
 }
