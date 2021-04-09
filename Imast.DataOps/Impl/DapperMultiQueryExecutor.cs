@@ -54,7 +54,7 @@ namespace Imast.DataOps.Impl
                 var queryResult = await this.Connection.QueryMultipleAsync(source, param, transaction, timeout, type);
 
                 // wrap result into a multi-result reader
-                using var reader = (IMultiResult) new DapperMultiResult(queryResult);
+                using var reader = (IMultiResult) new DapperMultiResult(queryResult, this.Buffered);
            
                 // map and get final result
                 return await resultHandler(reader);
