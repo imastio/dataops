@@ -51,6 +51,20 @@ namespace Imast.DataOps.Impl
         }
 
         /// <summary>
+        /// Initiate the query first operation
+        /// </summary>
+        /// <param name="key">The key of operation</param>
+        /// <returns></returns>
+        public IQueryFirstExecutor QueryFirst(OpKey key)
+        {
+            // get valid operation if exists
+            var operation = this.GetValidOrThrow(key, ResultType.Table);
+
+            // build query executor
+            return new DapperQueryFirstExecutor(this.connection, this.provider, operation);
+        }
+
+        /// <summary>
         /// Initiate the non-query operation
         /// </summary>
         /// <param name="key">The key of operation</param>

@@ -34,6 +34,34 @@
         }
 
         /// <summary>
+        /// Initiate the query first operation
+        /// </summary>
+        /// <param name="key">The key of operation</param>
+        /// <returns></returns>
+        IQueryFirstExecutor QueryFirst(OpKey key);
+
+        /// <summary>
+        /// Initiate the query first operation
+        /// </summary>
+        /// <param name="group">The operation group name</param>
+        /// <param name="operation">The operation name</param>
+        /// <returns></returns>
+        IQueryFirstExecutor QueryFirst(string group, string operation)
+        {
+            return this.QueryFirst(OpKey.Of(group, operation));
+        }
+
+        /// <summary>
+        /// Initiate the query first operation
+        /// </summary>
+        /// <param name="operation">The operation name</param>
+        /// <returns></returns>
+        IQueryFirstExecutor QueryFirst(string operation)
+        {
+            return this.QueryFirst(OpKey.Of(string.Empty, operation));
+        }
+
+        /// <summary>
         /// Initiate the non-query operation
         /// </summary>
         /// <param name="key">The key of operation</param>

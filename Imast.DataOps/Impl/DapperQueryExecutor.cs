@@ -4,7 +4,6 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Imast.DataOps.Api;
-using Imast.DataOps.Definitions;
 
 namespace Imast.DataOps.Impl
 {
@@ -30,36 +29,6 @@ namespace Imast.DataOps.Impl
         protected override IQueryExecutor GetThis()
         {
             return this;
-        }
-
-        /// <summary>
-        /// Gets the effective timeout value
-        /// </summary>
-        /// <returns></returns>
-        protected int? GetEffectiveTimeout()
-        {
-            // the timeout to use
-            return this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
-        }
-
-        /// <summary>
-        /// Gets the effective source value
-        /// </summary>
-        /// <returns></returns>
-        protected string GetEffectiveSource()
-        {
-            // the source of query
-            return this.Operation.Source?.ToString() ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Gets the effective command type
-        /// </summary>
-        /// <returns></returns>
-        protected CommandType GetEffectiveCommandType()
-        {
-            // use type based on value
-            return this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
         }
 
         /// <summary>
@@ -101,22 +70,6 @@ namespace Imast.DataOps.Impl
                     this.GetEffectiveTimeout(),
                     this.GetEffectiveCommandType())
                 );
-        }
-
-        /// <summary>
-        /// Execute the current operation
-        /// </summary>
-        /// <typeparam name="TResult">The result type</typeparam>
-        /// <param name="param">The parameter if given</param>
-        /// <returns></returns>
-        public async Task<TResult> ExecuteFirstOrDefaultAsync<TResult>(object param = null)
-        {
-            return await this.MaybeTransactionalAsync(transaction => this.Connection.QueryFirstOrDefaultAsync<TResult>(
-                this.GetEffectiveSource(),
-                param,
-                transaction,
-                this.GetEffectiveTimeout(),
-                this.GetEffectiveCommandType()));
         }
     }
 }
