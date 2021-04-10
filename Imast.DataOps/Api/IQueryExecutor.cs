@@ -28,13 +28,5 @@ namespace Imast.DataOps.Api
         /// <param name="param">The parameter if given</param>
         /// <returns></returns>
         Task<IEnumerable<TResult>> ExecuteAsync<TFirst, TSecond, TResult>(Func<TFirst, TSecond, TResult> map, string splitOn = "id", object param = null);
-
-        /// <summary>
-        /// Execute the current operation
-        /// </summary>
-        /// <typeparam name="TResult">The result type</typeparam>
-        /// <param name="param">The parameter if given</param>
-        /// <returns></returns>
-        Task<TResult> ExecuteFirstOrDefaultAsync<TResult>(object param = null);
     }
 }
