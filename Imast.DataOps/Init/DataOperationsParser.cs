@@ -233,7 +233,7 @@ namespace Imast.DataOps.Init
         private static CommandDefinition MapCommand(XmlNode element)
         {
             // get command source
-            var source = element.InnerText;
+            var source = element.InnerText?.Trim();
 
             // try get and parse expected result
             if (!Enum.TryParse<ExpectedResult>(element.Attributes?["ExpectedResult"]?.Value, out var expectedResult))
