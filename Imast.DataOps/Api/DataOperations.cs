@@ -37,6 +37,14 @@ namespace Imast.DataOps.Api
         }
 
         /// <summary>
+        /// Initialize globally when appropriate
+        /// </summary>
+        static DataOperations()
+        {
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+        }
+
+        /// <summary>
         /// Connect to a certain provider with given connection
         /// </summary>
         /// <param name="provider">The provider</param>
