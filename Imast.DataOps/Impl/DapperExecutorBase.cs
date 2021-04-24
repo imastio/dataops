@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Imast.DataOps.Api;
@@ -42,9 +43,14 @@ namespace Imast.DataOps.Impl
         public AutoTransaction? AutoTransaction { get; private set; }
 
         /// <summary>
+        /// The operation bindings
+        /// </summary>
+        public Dictionary<string, object> Bindings { get; }
+
+        /// <summary>
         /// The timeout to use
         /// </summary>
-        public TimeSpan? Timeout { get; set; }
+        public TimeSpan? Timeout { get; private set; }
 
         /// <summary>
         /// Dapper-based query executor
@@ -61,6 +67,7 @@ namespace Imast.DataOps.Impl
             this.Timeout = timeout;
             this.AutoCommit = autoTransaction.HasValue;
             this.Buffered = true;
+            this.Bindings = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -182,11 +189,23 @@ namespace Imast.DataOps.Impl
         }
 
         /// <summary>
+        /// Use the given binding for the operation
+        /// </summary>
+        /// <param name="binding">The binding name</param>
+        /// <param name="value">The binding value</param>
+        /// <returns></returns>
+        public TExecutor WithBinding(string binding, object value)
+        {
+            this.Bindings[binding] = value;
+            return this.GetThis();
+        }
+
+        /// <summary>
         /// Maps isolation level to concrete one
         /// </summary>
         /// <param name="transaction">The isolation type</param>
         /// <returns></returns>
-        protected static IsolationLevel MapIsolation(AutoTransaction transaction)
+        private static IsolationLevel MapIsolation(AutoTransaction transaction)
         {
             return transaction switch
             {

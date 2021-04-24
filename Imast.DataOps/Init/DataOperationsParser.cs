@@ -210,9 +210,9 @@ namespace Imast.DataOps.Init
                 Group = group
             };
 
-            // get command element of an operation
-            var command = element.GetElementsByTagName("Command").Cast<XmlElement>().FirstOrDefault();
-            
+            // get try get first child (only child in fact) of type Xml Element
+            var command = element.Cast<XmlElement>().FirstOrDefault(e => e != null);
+
             // map operation command
             operation.Command = MapCommand(command);
 
@@ -241,12 +241,20 @@ namespace Imast.DataOps.Init
                 expectedResult = ExpectedResult.Unknown;
             }
 
-            // try get and parse command type
-            if (!Enum.TryParse<CommandTypeOption>(element.Attributes?["Type"]?.Value, out var commandType))
+            // map the type if known
+            var type = element.Name.ToLower() switch
             {
-                commandType = CommandTypeOption.Unknown;
+                "StoredProcedure" => CommandTypeOption.StoredProcedure,
+                "TextCommand" => CommandTypeOption.Text,
+                _ => CommandTypeOption.Unknown
+            };
+
+            // if stored procedure is given, use name as source
+            if (type == CommandTypeOption.StoredProcedure)
+            {
+                source = element.Attributes?["Name"]?.Value;
             }
-            
+
             // try get and parse NotSupported value
             if(!bool.TryParse(element.Attributes?["NotSupported"]?.Value ?? "false", out var notSupported))
             {
@@ -257,7 +265,7 @@ namespace Imast.DataOps.Init
             return new CommandDefinition
             {
                 Source = source,
-                Type = commandType,
+                Type = type,
                 NotSupported = notSupported,
                 ExpectedResult = expectedResult
             };

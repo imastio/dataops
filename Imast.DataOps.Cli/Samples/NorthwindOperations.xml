@@ -7,19 +7,17 @@
 	<OperationGroup Name="Products">
 		
 		<SqlOperation Name="GetAll" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="ReadCommitted">
-			<Command>
-				select * from Products;
-				select * from Categories
-			</Command>
+			<StoredProcedure Name="GetAll" ExpectedResult="Table" />
 		</SqlOperation>
 	</OperationGroup>
 
-	<OperationGroup Name="Other">
-		<SqlOperation Name="WriteLog" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="RepeatableRead">
-			<Command>
-				insert into Log (Message)
-				values (@Message)
-			</Command>
+	<OperationGroup Name="Identity">
+		<SqlOperation Name="FilterGrants" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="RepeatableRead">
+			<TextCommand ExpectedResult="Table">
+				select * from grants
+				where 1=1
+				{if:useSubject { and subject = @subject } else {} }
+			</TextCommand>
 		</SqlOperation>
 	</OperationGroup>
 </DataOperations>

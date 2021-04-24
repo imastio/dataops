@@ -48,14 +48,20 @@
 		
 	</xs:element>
 
-	<!-- The command element definition.  -->
-	<xs:element name="Command">
+	<!-- The stored procedure element definition.  -->
+	<xs:element name="StoredProcedure">
+		<xs:complexType>
+			<xs:attributeGroup ref="BaseCommand" />
+			<xs:attribute name="Name" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+
+	<!-- The stored procedure element definition.  -->
+	<xs:element name="TextCommand">
 		<xs:complexType>
 			<xs:simpleContent>
-				<xs:extension base="xs:string">
-					<xs:attribute name="Type" type="CommandType" default="Text" />
-					<xs:attribute name="NotSupported" type="xs:boolean" default="false" />
-					<xs:attribute name="ExpectedResult" type="ExpectedResultOptions" default="Unknown" />
+				<xs:extension base="xs:normalizedString">
+					<xs:attributeGroup ref="BaseCommand" />
 				</xs:extension>
 			</xs:simpleContent>
 		</xs:complexType>
@@ -66,12 +72,15 @@
 		<xs:complexType>
 
 			<!-- Child Elements of Sql Operation -->
-			<xs:sequence>
+			<xs:choice>
 				
-				<!-- An Sql Operation should have defined Command string  -->
-				<xs:element ref="Command" />
+				<!-- A reference to stored procedure definition  -->
+				<xs:element ref="StoredProcedure" />
 
-			</xs:sequence>
+				<!-- A reference to text-based command definition  -->
+				<xs:element ref="TextCommand" />
+
+			</xs:choice>
 			
 			<!-- Required: Name of the Sql Operation -->
 			<xs:attribute name="Name" type="xs:string" use="required" />
@@ -94,20 +103,17 @@
 		<xs:attribute name="Timeout" type="xs:duration" />
 	</xs:attributeGroup>
 
+	<!-- Command-specific common attributes  -->
+	<xs:attributeGroup name="BaseCommand">
+		<xs:attribute name="ExpectedResult" type="ExpectedResultOptions" default="Unknown" />
+	</xs:attributeGroup>
+
 	<!-- Transaction-related attributes for operation groups and operations -->
 	<xs:attributeGroup name="Transactions">
 		<!-- Optional: Transactional behavior of operation -->
 		<xs:attribute name="AutoTransaction" type="AutoTransactionMode" />
 
 	</xs:attributeGroup>
-
-	<!-- The types of commands supported for operations -->
-	<xs:simpleType name="CommandType" final="restriction" >
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="Text" />
-			<xs:enumeration value="StoredProcedure" />
-		</xs:restriction>
-	</xs:simpleType>
 
 	<!-- The options of expected results -->
 	<xs:simpleType name="ExpectedResultOptions" final="restriction" >
@@ -138,15 +144,7 @@
 			<xs:enumeration value="Serializable" />
 		</xs:restriction>
 	</xs:simpleType>
-
-	<!-- Define the possible scopes of configuration unit -->
-	<xs:simpleType name="ConfigurationScope" final="restriction">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="File" />
-			<xs:enumeration value="Global" />
-		</xs:restriction>
-	</xs:simpleType>
-
+	
 	<!-- Define supported providers for the Operation or an Operation group -->
 	<xs:simpleType name="CompatibilityProviders" final="list" >
 		<xs:list>

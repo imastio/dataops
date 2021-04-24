@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Imast.DataOps.Api;
 using Imast.DataOps.Cli.Model;
 using Imast.DataOps.Init;
@@ -19,7 +20,7 @@ namespace Imast.DataOps.Cli
         public static void Main(string[] args)
         {
             // the connection string to Northwind database
-            var northwindConnectionString = @"Server = (local); Initial Catalog = Northwind; Integrated Security = true;";
+            var northwindConnectionString = @"Server = (local); Initial Catalog = Northwind; user=root;password=root";
 
             // build new data operations
             var dataOps = DataOperationsBuilder.New()
@@ -30,21 +31,11 @@ namespace Imast.DataOps.Cli
                 .Build();
 
 
-            // do operation and get result
-            var multiResult = dataOps.Connect().MultiQuery("Products", "GetAll").ExecuteAsync(async reader =>
-            {
-                var products = await reader.ReadAsync<Product>();
-                var cats = await reader.ReadAsync<dynamic>();
+            var filtered = dataOps.Connect().Query("Identity", "FilterGrants")
+                .WithBinding("useSubject", true)
+                .ExecuteAsync<dynamic>().Result;
 
-                return Tuple.Create(products, cats);
-            }).Result;
-
-            Console.WriteLine($"MultiRead Result: Products {multiResult.Item1.Count()}, Categories: {multiResult.Item2.Count()}");
-
-            var writeResult = dataOps.Connect().NonQuery("Other", "WriteLog")
-                .ExecuteAsync(new {Message = $"Hello. It's {DateTime.Now}"}).Result;
-
-            Console.WriteLine($"Log Written: {writeResult}");
+            Console.WriteLine($"Log Written: {0}");
         }
     }
 }
