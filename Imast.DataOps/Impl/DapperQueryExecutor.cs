@@ -39,8 +39,11 @@ namespace Imast.DataOps.Impl
         /// <returns></returns>
         public Task<IEnumerable<TResult>> ExecuteAsync<TResult>(object param = null)
         {
+            // get effective source
+            var effectiveSource = this.GetEffectiveSource();
+            
             return this.MaybeTransactionalAsync(transaction => this.Connection.QueryAsync<TResult>(
-                this.GetEffectiveSource(), 
+                effectiveSource, 
                 param, 
                 transaction,
                 this.GetEffectiveTimeout(),

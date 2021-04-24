@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 
 namespace Imast.DataOps.Api
@@ -32,6 +33,11 @@ namespace Imast.DataOps.Api
         /// The auto-transaction to use
         /// </summary>
         public AutoTransaction? AutoTransaction { get; }
+        
+        /// <summary>
+        /// The bindings of operation
+        /// </summary>
+        public Dictionary<string, object> Bindings { get; }
 
         /// <summary>
         /// Use the given transaction for the operation
@@ -54,5 +60,13 @@ namespace Imast.DataOps.Api
         /// <param name="timeout">The timeout to use</param>
         /// <returns></returns>
         TExecutor WithTimeout(TimeSpan? timeout);
+        
+        /// <summary>
+        /// Use the given binding for the operation
+        /// </summary>
+        /// <param name="binding">The binding name</param>
+        /// <param name="value">The binding value</param>
+        /// <returns></returns>
+        TExecutor WithBinding(string binding, object value);
     }
 }
