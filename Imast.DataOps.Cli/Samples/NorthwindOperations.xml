@@ -12,11 +12,14 @@
 	</OperationGroup>
 
 	<OperationGroup Name="Identity">
-		<SqlOperation Name="FilterGrants" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="RepeatableRead">
+		<SqlOperation Name="GetGrantsBy">
 			<TextCommand ExpectedResult="Table">
 				select * from grants
 				where 1=1
-				{if:useSubject { and subject = @subject } else {} }
+				{if:useSubject { and SubjectId = @SubjectId} else {} }
+				{if:useSession { and SessionId = @SessionId } else {1 = 1} }
+				{if:useClient { and ClientId= @ClientId} else {} }
+				{if:useType { and Type = @Type} else {} }
 			</TextCommand>
 		</SqlOperation>
 	</OperationGroup>

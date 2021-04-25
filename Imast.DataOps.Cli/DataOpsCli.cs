@@ -1,9 +1,5 @@
-﻿using System;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Data.SqlClient;
 using Imast.DataOps.Api;
-using Imast.DataOps.Cli.Model;
 using Imast.DataOps.Init;
 
 namespace Imast.DataOps.Cli
@@ -20,7 +16,7 @@ namespace Imast.DataOps.Cli
         public static void Main(string[] args)
         {
             // the connection string to Northwind database
-            var northwindConnectionString = @"Server = (local); Initial Catalog = Northwind; user=root;password=root";
+            var northwindConnectionString = @"Server = (local); Initial Catalog = Northwind; Integrated Security = True";
 
             // build new data operations
             var dataOps = DataOperationsBuilder.New()
@@ -30,12 +26,22 @@ namespace Imast.DataOps.Cli
                 .WithSource("Samples/NorthwindOperations.xml")
                 .Build();
 
+            var options = new
+            {
+                SubjectId = "",
+                SessionId = default(string),
+                ClientId = "Client",
+                Type = "something"
+            };
 
-            var filtered = dataOps.Connect().Query("Identity", "FilterGrants")
-                .WithBinding("useSubject", true)
+            // example of static source generation
+            var filtered = dataOps.Connect().Query("Identity", "GetGrantsBy")
+                .WithBinding("useSubject", options.SubjectId != null)
+                .WithBinding("useSession", options.SessionId != null)
+                .WithBinding("useClient", options.ClientId != null)
+                .WithBinding("useType", options.Type != null)
                 .ExecuteAsync<dynamic>().Result;
 
-            Console.WriteLine($"Log Written: {0}");
         }
     }
 }
