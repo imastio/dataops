@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>Davit Petrosyan</Authors>
     <Company>Imast Labs</Company>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
