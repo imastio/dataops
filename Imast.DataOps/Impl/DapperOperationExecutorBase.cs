@@ -14,7 +14,7 @@ namespace Imast.DataOps.Impl
         /// <summary>
         /// The if/else binding regular expression
         /// </summary>
-        private static readonly Regex IF_ELSE_REGEX = new Regex(@"{\s*if:(?<binding>[^{}]*)\s*{\s*(?<if>[^{}]*)\s*}\s*else?\s*{\s*(?<else>[^{}]*)\s*}\s*}");
+        protected static readonly Regex IF_ELSE_REGEX = new Regex(@"{\s*if:(?<binding>[^{}]*)\s*{\s*(?<if>[^{}]*)\s*}\s*else?\s*{\s*(?<else>[^{}]*)\s*}\s*}");
         
         /// <summary>
         /// The operation to execute
@@ -50,10 +50,15 @@ namespace Imast.DataOps.Impl
         protected virtual string GetEffectiveSource()
         {
             // the source of query
-            var source = this.Operation.Source?.ToString() ?? string.Empty;
+            var source = string.Empty;
 
-            // process source in case of text for resolving any bindings
-            return this.Operation.Type is OperationType.Text or OperationType.Unknown ? this.ResolveBindings(source) : source;
+            // resolve bindings if source is string
+            if (this.Operation.Source is string strSource)
+            {
+                source = this.ResolveBindings(strSource);
+            }
+
+            return source;
         }
 
         /// <summary>
@@ -63,7 +68,7 @@ namespace Imast.DataOps.Impl
         /// <returns></returns>
         private string ResolveBindings(string source)
         {
-            return IF_ELSE_REGEX.Replace(source, (match) =>
+            return IF_ELSE_REGEX.Replace(source, match =>
             {
                 // try get binding name
                 var binding = match.Groups["binding"].Value.Trim();
@@ -71,7 +76,7 @@ namespace Imast.DataOps.Impl
                 // leave untouched if binding is found but not specified
                 if (string.IsNullOrWhiteSpace(binding) || !this.Bindings.TryGetValue(binding, out var bindingValue))
                 {
-                    return match.Value;
+                    bindingValue = null;
                 }
 
                 // binding is fine if given
@@ -83,7 +88,7 @@ namespace Imast.DataOps.Impl
                     evaluateBinding = boolBinding;
                 }
                 
-                return evaluateBinding ? $" {match.Groups["if"].Value.Trim()} " : $" {match.Groups["else"].Value.Trim()} ";
+                return evaluateBinding ? $"{match.Groups["if"].Value.Trim()}" : $"{match.Groups["else"].Value.Trim()}";
             });
         }
 
