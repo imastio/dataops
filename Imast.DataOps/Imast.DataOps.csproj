@@ -7,7 +7,7 @@
     <Company>Imast Labs</Company>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/imastio/dataops</PackageProjectUrl>
-    <PackageVersion>0.0.3</PackageVersion>
+    <PackageVersion>0.0.4</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
