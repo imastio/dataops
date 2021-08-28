@@ -244,8 +244,8 @@ namespace Imast.DataOps.Init
             // map the type if known
             var type = element.Name.ToLower() switch
             {
-                "StoredProcedure" => CommandTypeOption.StoredProcedure,
-                "TextCommand" => CommandTypeOption.Text,
+                "storedprocedure" => CommandTypeOption.StoredProcedure,
+                "textcommand" => CommandTypeOption.Text,
                 _ => CommandTypeOption.Unknown
             };
 
