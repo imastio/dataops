@@ -30,6 +30,11 @@ namespace Imast.DataOps.Init
         protected SqlProvider? defaultProvider;
 
         /// <summary>
+        /// The default data source
+        /// </summary>
+        protected string defaultDataSource;
+
+        /// <summary>
         /// The flag to indicate if sources should be validated against schema
         /// </summary>
         protected bool schemaValidation;
@@ -68,6 +73,17 @@ namespace Imast.DataOps.Init
         public DataOperationsBuilder WithDefaultProvider(SqlProvider? provider)
         {
             this.defaultProvider = provider;
+            return this;
+        }
+
+        /// <summary>
+        /// Use given data source as default for this data operations instance
+        /// </summary>
+        /// <param name="dataSource">The target data source</param>
+        /// <returns></returns>
+        public DataOperationsBuilder WithDefaultDataSource(string dataSource)
+        {
+            this.defaultDataSource = dataSource;
             return this;
         }
 
@@ -117,6 +133,19 @@ namespace Imast.DataOps.Init
         }
 
         /// <summary>
+        /// Add a connection supplier for the mentioned provider 
+        /// </summary>
+        /// <param name="dataSource">The data source name</param>
+        /// <param name="provider">The sql provider</param>
+        /// <param name="supplier">The connection supplier for the given provider</param>
+        /// <returns></returns>
+        public DataOperationsBuilder WithConnection(string dataSource, SqlProvider provider, Func<IDbConnection> supplier)
+        {
+            this.suppliers.Register(dataSource, provider, supplier);
+            return this;
+        }
+
+        /// <summary>
         /// Build Data Operations instance from pieces
         /// </summary>
         /// <returns></returns>
@@ -138,7 +167,12 @@ namespace Imast.DataOps.Init
                 this.ProcessDefinition(result);
             });
 
-            return new DataOperations(this.operations, this.suppliers, this.defaultProvider);
+            if(this.defaultProvider == null)
+            {
+                throw new InvalidOperationException("The default provider is required to be given");
+            }
+
+            return new DataOperations(this.operations, this.suppliers, this.defaultDataSource, this.defaultProvider.Value);
         }
 
         /// <summary>
@@ -195,7 +229,7 @@ namespace Imast.DataOps.Init
                     var compatibility = op.Providers ?? CompatibilityProviders.Any;
 
                     // get supported providers
-                    var providers = Enum.GetValues<SqlProvider>().Where(p => compatibility.HasFlag(MapProvider(p)));
+                    var providers = GetEnumValues<SqlProvider>().Where(p => compatibility.HasFlag(MapProvider(p)));
 
                     // the target operation
                     var operation = new SqlOperation
@@ -257,6 +291,15 @@ namespace Imast.DataOps.Init
                 AutoTransactionMode.Serializable => AutoTransaction.Serializable,
                 _ => null
             };
+        }
+
+        /// <summary>
+        /// Gets the enum values of the given type
+        /// </summary>
+        /// <typeparam name="TValue">The enum value type</typeparam>
+        /// <returns></returns>
+        private static TValue[] GetEnumValues<TValue>() where TValue: Enum {
+            return Enum.GetValues(typeof(TValue)).Cast<TValue>().ToArray();
         }
     }
 }

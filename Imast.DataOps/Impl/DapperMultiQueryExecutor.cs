@@ -3,7 +3,6 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Imast.DataOps.Api;
-using Imast.DataOps.Definitions;
 
 namespace Imast.DataOps.Impl
 {
@@ -40,13 +39,13 @@ namespace Imast.DataOps.Impl
         public async Task<TResult>ExecuteAsync<TResult>(Func<IMultiResult, Task<TResult>> resultHandler, object param = null)
         {
             // the timeout to use
-            var timeout = this.Timeout.HasValue ? (int)this.Timeout.Value.TotalMilliseconds : default(int?);
+            var timeout = this.GetEffectiveTimeout();
 
             // the source of query
-            var source = this.Operation.Source?.ToString() ?? string.Empty;
+            var source = this.GetEffectiveSource(); 
 
             // use type based on value
-            var type = this.Operation.Type == OperationType.StoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+            var type = this.GetEffectiveCommandType();
 
             return await this.MaybeTransactionalAsync(async transaction => 
             {

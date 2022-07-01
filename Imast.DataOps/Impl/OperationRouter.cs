@@ -19,6 +19,11 @@ namespace Imast.DataOps.Impl
         protected readonly IDbConnection connection;
 
         /// <summary>
+        /// The data source name
+        /// </summary>
+        protected readonly string dataSource;
+
+        /// <summary>
         /// The target Sql Provider
         /// </summary>
         protected readonly SqlProvider provider;
@@ -29,8 +34,9 @@ namespace Imast.DataOps.Impl
         /// <param name="provider">The Sql Provider type</param>
         /// <param name="connection">The actual database connection</param>
         /// <param name="registry">The registry of operations</param>
-        public OperationRouter(SqlProvider provider, IDbConnection connection, IOperationRegistry registry)
+        public OperationRouter(string dataSource, SqlProvider provider, IDbConnection connection, IOperationRegistry registry)
         {
+            this.dataSource = dataSource;
             this.provider = provider;
             this.connection = connection;
             this.registry = registry;

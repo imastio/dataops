@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<DataOperations xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Imast.DataOps/DataOps.xsd">
+	
+	<DataConfiguration  />
+
+	<OperationGroup Name="Group">
+		
+		<SqlOperation Name="GetOne" Compatibility="SqlServer" Timeout="PT5M" AutoTransaction="ReadCommitted">
+      <TextCommand>
+        SELECT 1 AS [One];
+      </TextCommand>
+		</SqlOperation>
+
+    <SqlOperation Name="GetOne" Compatibility="SQLite" Timeout="PT5M" AutoTransaction="ReadCommitted">
+      <TextCommand>
+        SELECT 1 AS [One];
+      </TextCommand>
+    </SqlOperation>
+    
+	</OperationGroup>
+
+  <OperationGroup Name="Products">
+
+    <SqlOperation Name="GetById1IfBound" Compatibility="SQLite" Timeout="PT5M" AutoTransaction="RepeatableRead">
+      <TextCommand>
+        SELECT * FROM 'Product'
+        WHERE 1=1
+        {if:ByIdOne {AND Id = 1} else {}}
+        {if:ByIdTwo {AND Id = 2} else {}}
+      </TextCommand>
+    </SqlOperation>
+    
+  </OperationGroup>
+  
+</DataOperations>
